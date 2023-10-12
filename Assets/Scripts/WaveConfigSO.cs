@@ -12,6 +12,8 @@ public class WaveConfigSO : ScriptableObject
     [SerializeField] float spawnTimeVariance = 0f;
     [SerializeField] float minSpawnTime = 0.2f;
 
+    public float enemyWaitTime = 7f;
+
     public Transform GetStartingWayPoint(){
         return pathPrefab.GetChild(0);
     }

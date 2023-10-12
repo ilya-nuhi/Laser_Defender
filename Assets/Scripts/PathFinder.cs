@@ -10,6 +10,9 @@ public class PathFinder : MonoBehaviour
     EnemySpawner enemySpawner;
     WaveConfigSO waveConfig;
 
+    int enemyIndex;
+    int stopWayPoint;
+
     void Awake() {
         enemySpawner = FindObjectOfType<EnemySpawner>();    
     }
@@ -19,21 +22,32 @@ public class PathFinder : MonoBehaviour
         waveConfig = enemySpawner.GetCurrentWave();
         waypoints = waveConfig.GetWayPoints();
         transform.position = waypoints[waypointIndex].position;
+        enemyIndex = enemySpawner.enemyId;
+        stopWayPoint = waypoints.Count - waveConfig.GetEnemyCount() + enemyIndex -1;
     }
 
     void Update()
     {
-        FollowPath();
+        StartCoroutine(FollowPath());
     }
 
-    void FollowPath()
+    IEnumerator FollowPath()
     {
         if(waypointIndex < waypoints.Count){
             Vector3 targetPosition = waypoints[waypointIndex].position;
             float delta = waveConfig.GetMoveSpeed() * Time.deltaTime;
             transform.position = Vector2.MoveTowards(transform.position, targetPosition, delta);
             if(transform.position == targetPosition){
+                if(waypointIndex == stopWayPoint){
+                    yield return new WaitForSeconds(waveConfig.enemyWaitTime);
+                    waypointIndex = waypoints.Count-2;
+                }
+
                 waypointIndex++;
+                if(waypointIndex == waypoints.Count - waveConfig.GetEnemyCount() -1){
+                    waypointIndex += enemyIndex;
+                }
+
             }
         }
         else{
